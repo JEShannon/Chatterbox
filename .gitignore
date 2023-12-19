@@ -1,0 +1,8 @@
+# ignore all keys files, denoted using .keys filetype
+# sending private API keys to github is a really bad idea
+*/*.keys
+
+# ignore all __pycache__ files
+*/__pycache__/*
+*/*/__pycache__/*
+__pycache__/*
