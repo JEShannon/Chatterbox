@@ -11,9 +11,6 @@ class chatterbox ():
     def getContext(self):
         pass
 
-    def useContext(self, context):
-        pass
-
     def setKey(self, key, keyName):
         pass
 

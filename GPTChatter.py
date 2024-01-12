@@ -1,4 +1,6 @@
 import openai
+import os
+import sys
 from ModelChatter import chatterbox
 
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
@@ -21,7 +23,7 @@ def __validateLine(line):
 
 def validateContext(context, singleLine = False):
     #this function ensures that the context given is valid
-    if singleLine:
+    if singleLine or isinstance(context, str):
         return __validateLine(context)
     #multi-line contexts must both be lists of strings, and have every line validate correctly.
     if not isinstance(context, list):
@@ -32,6 +34,26 @@ def validateContext(context, singleLine = False):
     return True
 
 class GptBox(chatterbox):
+    def __checkForKey(self):
+        #files are stored in the local folder GPT, in openai.apikeys
+        keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
+        with open(keysLoc) as keyFile:
+            for keyLine in keyFile:
+                #check if the line even exists!
+                #TODO: See if you can validate the key somehow, right now it just trusts it.
+                name = "default"
+                keyTokens = keyLine.strip().split(":")
+                if(len(keyTokens) > 2):
+                    print("More than two tokens found on a line in the keys file, skipping...", file=sys.stderr)
+                    continue
+                if(len(keyTokens) == 2 and keyTokens[0].strip()):
+                    #this one has a name, use it!
+                    name = keyTokens[0].strip()
+                if(keyTokens[-1].strip()):
+                    self.__keys[name] = keyTokens[-1]
+        if(not self.__keys):
+            print("Warning, no keys found.  Ensure keys are set before using!", file=sys.stderr)
+        
     def __init__(self, *, model_type = "gpt-3.5-turbo", context = ""):
         if(not model_type in __validmodels):
             #check if the user wrote something like "gpt4"
@@ -47,8 +69,31 @@ class GptBox(chatterbox):
                 raise Exception("Invalid model name, use getValidModels to see valid options.")
                 return
         #now initialize the settings so we can add context if present
+        self.__context = []
         if(context and validateContext(context)):
-            self.context = context
+            self.__context = context
         elif(context):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
-        
+        self.__keys = {}
+        self.__checkForKey()
+        self.__initialized = False
+
+    def addContext(self, newContext):
+        if validateContext(newContext):
+            if isinstance(newContext, str):
+                self.__context.append(newContext)
+            else:
+                self.__context.extend(newContext)
+
+    def setContext(self, newContext):
+        if validateContext(newContext):
+            if isinstance(newContext, str):
+                self.__context = [newContext]
+            else:
+                self.__context = newContext
+
+    def getContext(self):
+        return self.__context
+
+    def setKey(self, key, keyName):
+        pass
