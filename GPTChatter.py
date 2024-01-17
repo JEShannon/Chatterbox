@@ -6,6 +6,8 @@ from ModelChatter import chatterbox
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ]
 
+DEFAULT_KEY_NAME = "default"
+
 def getValidModels():
     return __validmodels
 
@@ -38,9 +40,9 @@ def __saveKeys(keyMap):
         return
     keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
     with open(keysLoc, 'w') as keyFile:
-        keystring = keyMap.get("default", default="")
+        keystring = keyMap.get(DEFAULT_KEY_NAME, default="")
         for key in keyMap:
-            if(key == "default"):
+            if(key == DEFAULT_KEY_NAME):
                 continue
             keystring = keystring + '\n' + key + ":" + keyMap[key]
         keyFile.write(keystring)
@@ -49,6 +51,7 @@ class GptBox(chatterbox):
     def __checkForKey(self):
         #files are stored in the local folder GPT, in openai.apikeys
         keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
+        keyNames = []
         with open(keysLoc) as keyFile:
             for keyLine in keyFile:
                 if(not keyLine.strip()):
@@ -56,7 +59,7 @@ class GptBox(chatterbox):
                 #check if the line even exists!
                 #TODO: See if you can validate the key somehow, right now it just trusts it.
                 #TODO: Use OS environ vars to load default keys
-                name = "default"
+                name = DEFAULT_KEY_NAME
                 keyTokens = keyLine.strip().split(":")
                 if(len(keyTokens) > 2):
                     print("More than two tokens found on a line in the keys file, skipping...", file=sys.stderr)
@@ -65,11 +68,16 @@ class GptBox(chatterbox):
                     #this one has a name, use it!
                     name = keyTokens[0].strip()
                 if(keyTokens[-1].strip()):
+                    keyNames.append(name)
                     self.__keys[name] = keyTokens[-1]
         if(not self.__keys):
             print("Warning, no keys found.  Ensure keys are set before using!", file=sys.stderr)
+        else:
+            #set ourselves to the key default if it exists, otherwise whichever was first
+            if DEFAULT_KEY_NAME in keyNames:
+                self.__activeKey = DEFAULT_KEY_NAME
         
-    def __init__(self, *, model_type = "gpt-3.5-turbo", context = ""):
+    def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None keyName=None):
         if(not model_type in __validmodels):
             #check if the user wrote something like "gpt4"
             if(model_type.lower() == "gpt4"):
@@ -86,12 +94,15 @@ class GptBox(chatterbox):
         #now initialize the settings so we can add context if present
         self.__context = []
         if(context and validateContext(context)):
-            self.__context = context
+            if isinstance(context, str):
+                self.__context = [context]
+            else:
+                self.__context = context
         elif(context):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
         self.__keys = {}
-        self.__checkForKey()
         self.__activeKey = None
+        self.__checkForKey()
         self.__initialized = False
 
     def addContext(self, newContext):
@@ -131,8 +142,11 @@ class GptBox(chatterbox):
             return True
         return False
 
-    def initialize(self):
-        pass
+    def initialize(self, *, key=None, context=None):
+        #first check if the key exists
+        if not self.__activeKey:
+            if key:
+                #if given a key here, then 
 
     def isInitialized(self):
         return self.__initialized
