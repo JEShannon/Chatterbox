@@ -7,6 +7,8 @@ __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ]
 
 DEFAULT_KEY_NAME = "default"
+#files are stored in the local folder GPT, in openai.apikeys
+KEYS_LOCATION = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
 
 def getValidModels():
     return __validmodels
@@ -38,8 +40,7 @@ def validateContext(context, singleLine = False):
 def __saveKeys(keyMap):
     if not keyMap:
         return
-    keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
-    with open(keysLoc, 'w') as keyFile:
+    with open(KEYS_LOCATION, 'w') as keyFile:
         keystring = keyMap.get(DEFAULT_KEY_NAME, default="")
         for key in keyMap:
             if(key == DEFAULT_KEY_NAME):
@@ -49,10 +50,8 @@ def __saveKeys(keyMap):
 
 class GptBox(chatterbox):
     def __checkForKey(self):
-        #files are stored in the local folder GPT, in openai.apikeys
-        keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
         keyNames = []
-        with open(keysLoc) as keyFile:
+        with open(KEYS_LOCATION) as keyFile:
             for keyLine in keyFile:
                 if(not keyLine.strip()):
                     continue
@@ -76,8 +75,10 @@ class GptBox(chatterbox):
             #set ourselves to the key default if it exists, otherwise whichever was first
             if DEFAULT_KEY_NAME in keyNames:
                 self.__activeKey = DEFAULT_KEY_NAME
+            else:
+                self.__activeKey = keyNames[0]
         
-    def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None keyName=None):
+    def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None, keyName=None, saveKeys=True):
         if(not model_type in __validmodels):
             #check if the user wrote something like "gpt4"
             if(model_type.lower() == "gpt4"):
@@ -102,6 +103,8 @@ class GptBox(chatterbox):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
         self.__keys = {}
         self.__activeKey = None
+        self.__keysUpdated = False
+        self.__saveKeys = saveKeys
         self.__checkForKey()
         self.__initialized = False
 
@@ -113,24 +116,33 @@ class GptBox(chatterbox):
                 self.__context.extend(newContext)
 
     def setContext(self, newContext):
+        #returns true if the context was accepted, false otherwise
         if validateContext(newContext):
             if isinstance(newContext, str):
                 self.__context = [newContext]
             else:
                 self.__context = newContext
+            return True
+        return False
 
     def getContext(self):
         return self.__context
 
     #TODO: use the environment variables to hold default keys
-    def setKey(self, key, keyName):
-        return self.__keys[keyName] = key
+    def setKey(self, key, keyName, *, useKey=False):
+        self.__keys[keyName] = key
+        self.__keysUpdated = True
+        if(useKey):
+            self.activeKey = keyName
 
     def getKey(self, keyName=None, *, default=None):
         #if no name is supplied, get the key we are currently using
         if not keyName:
             return self.__keys.get(self.__activeKey, default=default)
         return self.__keys.get(keyName, default=default)
+
+    def getCurrentKeyName(self):
+        return self.__activeKey
 
     def useKey(self, keyName):
         #TODO: validate the key somehow, but currently it just accepts it if it exists at all
@@ -146,7 +158,26 @@ class GptBox(chatterbox):
         #first check if the key exists
         if not self.__activeKey:
             if key:
-                #if given a key here, then 
+                #if given a key here, then set it to be the default and use it
+                self.__activeKey = DEFAULT_KEY_NAME
+                self.__keys[DEFAULT_KEY_NAME] = key
+            elif self.__keys.get(DEFAULT_KEY_NAME):
+                #if a default key was added/found but somehow missed, use it here
+                self.__activeKey = DEFAULT_KEY_NAME
+            #the checks failed, print to stderr and return False.  Do not initialize.
+            else:
+                print("No keys were found!  Either give one to the initialize function or set it with setKey!", file=std.err)
+                return False
+        #now check if the context exists or if the user provided context here
+        if not self.__context:
+            if not self.setContext(context):
+                #if this context is invalid, then we failed initialization.  State that and return.
+                print("Warning!  Context is invalid!  Aborting!", file-std.err)
+                return False
+        #Everything is now ready to begin, so wrap up and return
+        self.__initialized = True
+        return True
+                
 
     def isInitialized(self):
         return self.__initialized
