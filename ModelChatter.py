@@ -14,10 +14,10 @@ class chatterbox ():
     def setKey(self, key, keyName):
         pass
 
-    def getKey(self):
+    def getKey(self, keyName):
         pass
 
-    def useKey(self):
+    def useKey(self, keyName):
         pass
 
     def initialize(self):

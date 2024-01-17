@@ -19,7 +19,7 @@ def __validateLine(line):
     tokens = line.split(":", 1)
     if (not (tokens[0].strip().lower() in __validoperators and tokens[1].strip())):
         return False
-    return True 
+    return True
 
 def validateContext(context, singleLine = False):
     #this function ensures that the context given is valid
@@ -33,14 +33,29 @@ def validateContext(context, singleLine = False):
             return False
     return True
 
+def __saveKeys(keyMap):
+    if not keyMap:
+        return
+    keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
+    with open(keysLoc, 'w') as keyFile:
+        keystring = keyMap.get("default", default="")
+        for key in keyMap:
+            if(key == "default"):
+                continue
+            keystring = keystring + '\n' + key + ":" + keyMap[key]
+        keyFile.write(keystring)
+
 class GptBox(chatterbox):
     def __checkForKey(self):
         #files are stored in the local folder GPT, in openai.apikeys
         keysLoc = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
         with open(keysLoc) as keyFile:
             for keyLine in keyFile:
+                if(not keyLine.strip()):
+                    continue
                 #check if the line even exists!
                 #TODO: See if you can validate the key somehow, right now it just trusts it.
+                #TODO: Use OS environ vars to load default keys
                 name = "default"
                 keyTokens = keyLine.strip().split(":")
                 if(len(keyTokens) > 2):
@@ -76,6 +91,7 @@ class GptBox(chatterbox):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
         self.__keys = {}
         self.__checkForKey()
+        self.__activeKey = None
         self.__initialized = False
 
     def addContext(self, newContext):
@@ -95,5 +111,28 @@ class GptBox(chatterbox):
     def getContext(self):
         return self.__context
 
+    #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName):
+        return self.__keys[keyName] = key
+
+    def getKey(self, keyName=None, *, default=None):
+        #if no name is supplied, get the key we are currently using
+        if not keyName:
+            return self.__keys.get(self.__activeKey, default=default)
+        return self.__keys.get(keyName, default=default)
+
+    def useKey(self, keyName):
+        #TODO: validate the key somehow, but currently it just accepts it if it exists at all
+        #Returns true if the system successfully swapped to the key
+        #Returns false if the key wasn't found
+        #Note that a key MUST be set in order to fully initialize
+        if self.__keys.get(keyName):
+            self.__activeKey = keyName
+            return True
+        return False
+
+    def initialize(self):
         pass
+
+    def isInitialized(self):
+        return self.__initialized
