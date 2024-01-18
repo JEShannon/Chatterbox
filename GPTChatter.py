@@ -17,7 +17,7 @@ def getValidOperators():
     return __validoperators
 
 def __validateLine(line):
-    #if the line is a string, and is formatted as "[system|user|assistant]: [Message]", then it is valid!
+    #if the line is a string, and is formatted as "[system|user|assistant]:[Message]", then it is valid!
     if(not isinstance(line, str)):
         return False
     tokens = line.split(":", 1)
@@ -154,7 +154,7 @@ class GptBox(chatterbox):
             return True
         return False
 
-    def initialize(self, *, key=None, context=None):
+    def initialize(self, *, key=None, context=None, *, noContext=False):
         #first check if the key exists
         if not self.__activeKey:
             if key:
@@ -170,14 +170,46 @@ class GptBox(chatterbox):
                 return False
         #now check if the context exists or if the user provided context here
         if not self.__context:
-            if not self.setContext(context):
+            if noContext:
+                #just let it go through without any context
+                self.__context = []
+            elif not self.setContext(context):
                 #if this context is invalid, then we failed initialization.  State that and return.
                 print("Warning!  Context is invalid!  Aborting!", file-std.err)
                 return False
         #Everything is now ready to begin, so wrap up and return
+        #We set the base context used by the system, as well as the key used
+        self.__transcript = self.__context
+        openai.api_key = self.getKey()
         self.__initialized = True
         return True
                 
+    def __setTranscript(self, script):
+        if validateContext(script):
+            if isinstance(script, str):
+                self.__transcript = [script]
+            else:
+                self.__transcript = script
+            return True
+        return False
 
     def isInitialized(self):
         return self.__initialized
+
+    def respond(self):
+        if not self.__initialized:
+            print("Error, not initialized, use initialize() first!", file=std.err)
+
+    def prompt(self):
+        if not self.__initialized:
+            print("Error, not initialized, use initialize() first!", file=std.err)
+
+    def getTranscript(self):
+        if not self.__initialized:
+            print("Error, transcript is made during initialization, use initialize() first!", file=std.err)
+
+    def updateTranscript(self, newTranscript):
+        if not self.__initialized:
+            print("Error, the transcript value is made during initialization, use initialize() first!", file=std.err)
+        return self.__setTranscript(self, newTranscript)
+        
