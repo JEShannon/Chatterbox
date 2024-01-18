@@ -210,7 +210,7 @@ class GptBox(chatterbox):
             return False
         if isinstance(text, str):
             self.__transcript.append(text)
-        else:
+        else: #for validateContext to pass, it must be either a list of strings or a string
             self.__transcript.extend(text)
         return True
 
