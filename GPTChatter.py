@@ -199,14 +199,26 @@ class GptBox(chatterbox):
     def respond(self):
         if not self.__initialized:
             print("Error, not initialized, use initialize() first!", file=std.err)
+        #get a response via the API
+        #add the response to the transcript
+        #return the response
 
-    def prompt(self):
+    def prompt(self, text):
         if not self.__initialized:
             print("Error, not initialized, use initialize() first!", file=std.err)
+        if not validateContext(text):
+            return False
+        if isinstance(text, str):
+            self.__transcript.append(text)
+        else:
+            self.__transcript.extend(text)
+        return True
 
     def getTranscript(self):
         if not self.__initialized:
             print("Error, transcript is made during initialization, use initialize() first!", file=std.err)
+            return None
+        return self.__transcript
 
     def updateTranscript(self, newTranscript):
         if not self.__initialized:

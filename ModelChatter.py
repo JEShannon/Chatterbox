@@ -26,9 +26,6 @@ class chatterbox ():
     def isInitialized(self):
         pass
 
-    def reInitialize(self):
-        pass
-
     #Functions for interacting with the bot
     def respond(self):
         pass
