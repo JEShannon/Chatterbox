@@ -6,6 +6,8 @@ from ModelChatter import chatterbox
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ]
 
+DEBUG_OUTPUT = False
+
 DEFAULT_KEY_NAME = "default"
 #files are stored in the local folder GPT, in openai.apikeys
 KEYS_LOCATION = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "GPT", "openAI.apikeys")
@@ -195,6 +197,19 @@ class GptBox(chatterbox):
 
     def isInitialized(self):
         return self.__initialized
+
+    def __transcriptToAPI(self):
+        #take the transcript, and turn it into a form usable by the API
+        #the API expects a list of dicts, each having a "role" and "content" key
+        apiDictList = []
+        for line in self.__transcript:
+            parts = line.split(":")
+            apiDict = {"role":parts[0], "content":parts[1]}
+            apiDictList.append(apiDict)
+        return apiDictList
+
+    def __APIToTranscript(self, response):
+        pass
 
     def respond(self):
         if not self.__initialized:
