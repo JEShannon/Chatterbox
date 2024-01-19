@@ -5,7 +5,7 @@ from ModelChatter import chatterbox
 
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ] #all valid operators
-__AIOPERATOR = ___validoperators[2] #the operator for the AI specifically
+__AIOPERATOR = __validoperators[2] #the operator for the AI specifically
 #possible TODO: allow this to be changed somehow?  Likely unneeded
 
 DEBUG_OUTPUT = False
@@ -160,7 +160,7 @@ class GptBox(chatterbox):
             return True
         return False
 
-    def initialize(self, *, key=None, context=None, *, noContext=False):
+    def initialize(self, *, key=None, context=None, noContext=False):
         #first check if the key exists
         if not self.__activeKey:
             if key:
