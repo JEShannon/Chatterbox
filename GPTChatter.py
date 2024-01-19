@@ -96,6 +96,7 @@ class GptBox(chatterbox):
                 #throw an error and return, don't try to keep going
                 raise Exception("Invalid model name, use getValidModels to see valid options.")
                 return
+        self.__aiModel = model_type
         #now initialize the settings so we can add context if present
         self.__context = []
         if(context and validateContext(context)):
@@ -110,6 +111,7 @@ class GptBox(chatterbox):
         self.__keysUpdated = False
         self.__saveKeys = saveKeys
         self.__checkForKey()
+        self.__apiClient = openai.OpenAI()
         self.__initialized = False
 
     def addContext(self, newContext):
@@ -187,15 +189,6 @@ class GptBox(chatterbox):
         openai.api_key = self.getKey()
         self.__initialized = True
         return True
-
-    def addToTranscript(self, responses):
-        if validateContext(responses):
-            if isinstance(responses, str):
-                self.__transcript.append(script)
-            else:
-                self.__transcript.extend(script)
-            return True
-        return False
                 
     def __setTranscript(self, script):
         if validateContext(script):
@@ -216,20 +209,28 @@ class GptBox(chatterbox):
         for line in self.__transcript:
             parts = line.split(":")
             apiDict = {"role":parts[0], "content":parts[1]}
+            if DEBUG_OUTPUT:
+                print(apiDict)
             apiDictList.append(apiDict)
         return apiDictList
 
     def __APIToTranscript(self, response):
         #given the following response, add it to the transcript
         newResponse = __AIOPERATOR + ":" + response
-        return self.addToTranscript(newResponse)
+        return self.prompt(newResponse)
 
     def respond(self):
         if not self.__initialized:
             print("Error, not initialized, use initialize() first!", file=std.err)
         #get a response via the API
+        response = self.___apiClient.chat.completions.create(
+                model=self.__aiModel,
+                messages = self.__transcriptToAPI()
+                ).choices[0].message
         #add the response to the transcript
+        self.__APIToTranscript(response)
         #return the response
+        return response
 
     def prompt(self, text):
         if not self.__initialized:
@@ -247,6 +248,7 @@ class GptBox(chatterbox):
             print("Error, transcript is made during initialization, use initialize() first!", file=std.err)
             return None
         return self.__transcript
+    
 
     def updateTranscript(self, newTranscript):
         if not self.__initialized:
