@@ -17,6 +17,9 @@ KEYS_LOCATION = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "G
 def getValidModels():
     return __validmodels
 
+def validateModelName(name):
+    return name in __validmodels
+
 def getValidOperators():
     return __validoperators
 
@@ -83,7 +86,7 @@ class GptBox(chatterbox):
                 self.__activeKey = keyNames[0]
         
     def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None, keyName=None, saveKeys=True):
-        if(not model_type in __validmodels):
+        if(not validateModelName(model_type)):
             #check if the user wrote something like "gpt4"
             if(model_type.lower() == "gpt4"):
                 model_type = "gpt-4"
@@ -111,7 +114,7 @@ class GptBox(chatterbox):
         self.__keysUpdated = False
         self.__saveKeys = saveKeys
         self.__checkForKey()
-        self.__apiClient = openai.OpenAI()
+        self.__apiClient = None
         self.__initialized = False
 
     def addContext(self, newContext):
@@ -172,7 +175,7 @@ class GptBox(chatterbox):
                 self.__activeKey = DEFAULT_KEY_NAME
             #the checks failed, print to stderr and return False.  Do not initialize.
             else:
-                print("No keys were found!  Either give one to the initialize function or set it with setKey!", file=std.err)
+                print("No keys were found!  Either give one to the initialize function or set it with setKey!", file=sys.stderr)
                 return False
         #now check if the context exists or if the user provided context here
         if not self.__context:
@@ -181,12 +184,13 @@ class GptBox(chatterbox):
                 self.__context = []
             elif not self.setContext(context):
                 #if this context is invalid, then we failed initialization.  State that and return.
-                print("Warning!  Context is invalid!  Aborting!", file-std.err)
+                print("Warning!  Context is invalid!  Aborting!", file=sys.stderr)
                 return False
         #Everything is now ready to begin, so wrap up and return
         #We set the base context used by the system, as well as the key used
         self.__transcript = self.__context
         openai.api_key = self.getKey()
+        self.__apiClient = openai.OpenAI()
         self.__initialized = True
         return True
                 
@@ -221,7 +225,8 @@ class GptBox(chatterbox):
 
     def respond(self):
         if not self.__initialized:
-            print("Error, not initialized, use initialize() first!", file=std.err)
+            print("Error, not initialized, use initialize() first!", file=sys.stderr)
+            return None
         #get a response via the API
         response = self.___apiClient.chat.completions.create(
                 model=self.__aiModel,
@@ -234,7 +239,7 @@ class GptBox(chatterbox):
 
     def prompt(self, text):
         if not self.__initialized:
-            print("Error, not initialized, use initialize() first!", file=std.err)
+            print("Error, not initialized, use initialize() first!", file=sys.stderr)
         if not validateContext(text):
             return False
         if isinstance(text, str):
@@ -245,13 +250,13 @@ class GptBox(chatterbox):
 
     def getTranscript(self):
         if not self.__initialized:
-            print("Error, transcript is made during initialization, use initialize() first!", file=std.err)
+            print("Error, transcript is made during initialization, use initialize() first!", file=sys.stderr)
             return None
         return self.__transcript
     
 
     def updateTranscript(self, newTranscript):
         if not self.__initialized:
-            print("Error, the transcript value is made during initialization, use initialize() first!", file=std.err)
+            print("Error, the transcript value is made during initialization, use initialize() first!", file=sys.stderr)
         return self.__setTranscript(self, newTranscript)
-        
+
