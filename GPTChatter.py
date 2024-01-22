@@ -147,8 +147,8 @@ class GptBox(chatterbox):
     def getKey(self, keyName=None, *, default=None):
         #if no name is supplied, get the key we are currently using
         if not keyName:
-            return self.__keys.get(self.__activeKey, default=default)
-        return self.__keys.get(keyName, default=default)
+            return self.__keys.get(self.__activeKey, default)
+        return self.__keys.get(keyName, default)
 
     def getCurrentKeyName(self):
         return self.__activeKey
