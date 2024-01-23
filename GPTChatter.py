@@ -5,7 +5,7 @@ from ModelChatter import chatterbox
 
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ] #all valid operators
-__AIOPERATOR = __validoperators[2] #the operator for the AI specifically
+AIOPERATOR = __validoperators[2] #the operator for the AI specifically
 #possible TODO: allow this to be changed somehow?  Likely unneeded
 
 DEBUG_OUTPUT = False
@@ -219,7 +219,7 @@ class GptBox(chatterbox):
 
     def __APIToTranscript(self, response):
         #given the following response, add it to the transcript
-        newResponse = __AIOPERATOR + ":" + response
+        newResponse = AIOPERATOR + ":" + response
         return self.prompt(newResponse)
 
     def respond(self):
@@ -232,7 +232,7 @@ class GptBox(chatterbox):
                 messages = self.__transcriptToAPI()
                 ).choices[0].message
         #add the response to the transcript
-        #self.__APIToTranscript(response)
+        self.__APIToTranscript(response.content)
         #return the response
         return response
 

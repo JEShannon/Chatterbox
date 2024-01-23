@@ -19,16 +19,22 @@ def main():
 
     response = box.respond()
 
-    print(response)
+    print("What is the company that owns Google?")
+
+    #print(response)
     print(response.content)
 
     if not response:
         print("Error!  Unable to get input from the model.  Ensure it is working correctly and has a proper connection to needed servers.", file=sys.stderr)
         return
 
-    if not str(response).strip().casefold() == "Alphabet".casefold():
-        print("response was not entirely as expected, have a human inspect the prompt!")
+    strResponse = str(response.content)
 
+    
+    if not strResponse.strip()[:8].casefold() == "Alphabet".casefold():
+        print("response was not entirely as expected, have a human inspect the prompt!")
+    else:
+        print("ChatGPT got the question right!")
 
 if __name__ == "__main__":
     main()
