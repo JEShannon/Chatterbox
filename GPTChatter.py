@@ -189,8 +189,7 @@ class GptBox(chatterbox):
         #Everything is now ready to begin, so wrap up and return
         #We set the base context used by the system, as well as the key used
         self.__transcript = self.__context
-        openai.api_key = self.getKey()
-        self.__apiClient = openai.OpenAI()
+        self.__apiClient = openai.OpenAI(api_key = self.getKey())
         self.__initialized = True
         return True
                 
@@ -212,7 +211,7 @@ class GptBox(chatterbox):
         apiDictList = []
         for line in self.__transcript:
             parts = line.split(":")
-            apiDict = {"role":parts[0], "content":parts[1]}
+            apiDict = {"role":parts[0].strip(), "content":parts[1].strip()}
             if DEBUG_OUTPUT:
                 print(apiDict)
             apiDictList.append(apiDict)
@@ -228,12 +227,12 @@ class GptBox(chatterbox):
             print("Error, not initialized, use initialize() first!", file=sys.stderr)
             return None
         #get a response via the API
-        response = self.___apiClient.chat.completions.create(
+        response = self.__apiClient.chat.completions.create(
                 model=self.__aiModel,
                 messages = self.__transcriptToAPI()
                 ).choices[0].message
         #add the response to the transcript
-        self.__APIToTranscript(response)
+        #self.__APIToTranscript(response)
         #return the response
         return response
 
