@@ -5,9 +5,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/ChattingBox"]
 
+[tool.hatch.build]
+exclude = [
+    "*/*.apikeys",
+]
+
 [project]
 name = "ChattingBox"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="James Shannon", email="J.Shannon09@yahoo.com" },
 ]
