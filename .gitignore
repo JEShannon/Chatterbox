@@ -9,3 +9,7 @@ __pycache__/*
 
 #ignore wheel files since they can be gotten through pip
 dist/*
+
+#ignore dist files that are archived
+archives/*
+archives/*/*
