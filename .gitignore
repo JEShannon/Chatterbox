@@ -6,3 +6,6 @@
 */__pycache__/*
 */*/__pycache__/*
 __pycache__/*
+
+#ignore wheel files since they can be gotten through pip
+dist/*
