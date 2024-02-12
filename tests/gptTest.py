@@ -1,6 +1,6 @@
 import sys
 
-from GPTChatter import *
+from ChattingBox.GPTChatter import *
 
 
 #Just give it a singulat test, see if it can respond correctly when asked to perform a simple task.
