@@ -101,6 +101,17 @@ class GptBox(chatterbox):
                 self.__activeKey = keyNames[0]
         
     def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None, keyName=None, saveKeys=True):
+        """
+        Create the object, and populate the fields given by the user.
+        The defaults here ensure that the system can run provided a valid API kay already exists in the openAI.apikeys file
+
+        Keyword Arguments:
+        model_type - Which model to use, currently only a few models are accepted, though the naming is somewhat lenient for gpt4/gpt3.5
+        context - Context that should be validated first, but otherwise is used as the base instructions for the model
+        key - The specific key to use for the model.  Currently there is no key validation.  This key will be saved unless specified otherwise
+        keyName - The indentifier for this key.  This must be a string, and if not specified or invalid "default" will be used
+        saveKeys - Whether the keys should be saved or not.  If set to false, the system will not save any keys passed to it to disk
+        """
         if(not validateModelName(model_type)):
             #check if the user wrote something like "gpt4"
             if(model_type.lower() == "gpt4"):
@@ -133,6 +144,7 @@ class GptBox(chatterbox):
         self.__initialized = False
 
     def addContext(self, newContext):
+        """Add the given context to the existing context the model has, if it is valid."""
         if validateContext(newContext):
             if isinstance(newContext, str):
                 self.__context.append(newContext)
@@ -140,6 +152,7 @@ class GptBox(chatterbox):
                 self.__context.extend(newContext)
 
     def setContext(self, newContext):
+        """Replace the context with the given context, if it is valid."""
         #returns true if the context was accepted, false otherwise
         if validateContext(newContext):
             if isinstance(newContext, str):
@@ -150,10 +163,21 @@ class GptBox(chatterbox):
         return False
 
     def getContext(self):
+        """Return the context."""
         return self.__context
 
     #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName, *, useKey=False):
+        """
+        Save a key to the manager under a specified name, if both exist
+
+        Keyword Arguements:
+        key - Object representation of the key, must exist
+        keyName - String name for the key, must exist and be a string
+        useKey [specified only] - if true, set this to be the key used by the agent
+        """
+        if (not key) or (not keyName) or (not isinstance(keyName, str)):
+            return
         self.__keys[keyName] = key
         self.__keysUpdated = True
         if(useKey):
