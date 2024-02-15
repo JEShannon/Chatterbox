@@ -184,15 +184,18 @@ class GptBox(chatterbox):
             self.activeKey = keyName
 
     def getKey(self, keyName=None, *, default=None):
+        """Get the key specified.  Return default if it doesn't exist."""
         #if no name is supplied, get the key we are currently using
         if not keyName:
             return self.__keys.get(self.__activeKey, default)
         return self.__keys.get(keyName, default)
 
     def getCurrentKeyName(self):
+        """Get the name of the key we are using."""
         return self.__activeKey
 
     def useKey(self, keyName):
+        """Change the key we are using to the specified one, if it exists."""
         #TODO: validate the key somehow, but currently it just accepts it if it exists at all
         #Returns true if the system successfully swapped to the key
         #Returns false if the key wasn't found
