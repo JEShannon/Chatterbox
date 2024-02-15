@@ -3,7 +3,7 @@ def TEXT_TO_SCRIPT(text):
     #this function takes normal sentence by sentence text and converts it to a valid script
     #it is intended that any script returned by this function will pass validateContext()
     #this will not return anything if the text input is not a string or a list of strings
-    if (not isinstance(text, str)) and (not isinstance(text, list)):
+    if not (isinstance(text, str) or isinstance(text, list)):
         return None
     result = []
     lines = text
@@ -37,3 +37,6 @@ _MathAdviceHelper = ["You are an assistant who is helping a human with math prob
                      ]
 
  
+Advisor = AgentProfile("Advisor", "An advice-giving agent who tries their best to help you", TEXT_TO_SCRIPT(_SecondOpinionScript))
+
+Math_Tutor = AgentProfile("Math Tutor", "A math-savvy agent that wants you to understand math problems, and doesn't just solve them for you.", TEXT_TO_SCRIPT(_MathAdviceHelper))
