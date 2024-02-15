@@ -33,6 +33,14 @@ def __validateLine(line):
     return True
 
 def validateContext(context, singleLine = False):
+    """
+    Validate that the context is correct and won't cause errors during API calls.
+    Valid context can be either a single string or a list of strings
+
+    Keyword Arguments:
+    context - object that may be valid context for API calls
+    singleLine - if true, forces the context to be a single string
+    """
     #this function ensures that the context given is valid
     if singleLine or isinstance(context, str):
         return __validateLine(context)
@@ -56,7 +64,14 @@ def __saveKeys(keyMap):
         keyFile.write(keystring)
 
 class GptBox(chatterbox):
+    """
+    This class wraps around the openai API to handle busywork like key and transcript management.
+    In order to function correctly, the object must be properly initialized after creation, through the initialize() method.
+    This module also requires a key (either given or from a file) in order to be initialized.
+    If initialized, the object should have all the information needed to call the API, provided it is accurate.
+    """
     def __checkForKey(self):
+        """Check for an .apikeys file containing openai keys"""
         keyNames = []
         with open(KEYS_LOCATION) as keyFile:
             for keyLine in keyFile:
