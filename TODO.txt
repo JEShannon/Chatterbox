@@ -1,0 +1,30 @@
+Main Objectives:
+
+GPT--
+1. Add support for other API features, like speech to text recognition
+2. Handle key management better, specifically checking the environment key, maybe setting it, and see if there is a way to validate a key (so the manager only stores VALID keys)
+2b. Maybe add encryption to the keys file as an option
+3. Add more base profiles
+4. Add a demonstration for the package, though it would need an API key to run.  Maybe a transcript instead?
+5. Add testing scripts to ensure proper functionality
+6. Expand on existing profiles to increase accuracy and make them stay on task better
+
+Other Generative AI systems:
+
+Gemini (formerly bard)?
+-Currently no official python package, restricted access to API
+-Might have to write the API caller myself to add to this package
+-Requires more investigation
+
+Llama 2?
+-Not really investigated yet.
+-Again might have to write the API caller myself
+
+Claude:
+-More investigation needed
+-Good chatbot candidate
+
+OTHER:
+--Add github integration for Pypi
+--Improve documentation of functions for better software maintenance
+--Refactor code from GPTChatter to ModelChatter that will be used by other (to be made) classes
