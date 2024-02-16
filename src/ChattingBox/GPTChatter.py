@@ -206,6 +206,16 @@ class GptBox(chatterbox):
         return False
 
     def initialize(self, *, key=None, context=None, noContext=False):
+        """
+        Ensure that all needed parameters for using the API are ready.
+        If they are, allow the object to start interacting with the API.
+        All function params are optional and must be specified.
+
+        Keyword Arguements:
+        key - A key to be used for accessing the OpenAI API
+        context - Agent context to inform the agent's responses.  Must be valid
+        noContext - If true, the agent ignores any checks for context and starts with no context at all.
+        """
         #first check if the key exists
         if not self.__activeKey:
             if key:
@@ -245,6 +255,7 @@ class GptBox(chatterbox):
         return False
 
     def isInitialized(self):
+        """Check if the object has finished initialization."""
         return self.__initialized
 
     def __transcriptToAPI(self):
@@ -265,6 +276,7 @@ class GptBox(chatterbox):
         return self.prompt(newResponse)
 
     def respond(self):
+        """Call the API and get the LLM's response.  Save it and return the response."""
         if not self.__initialized:
             print("Error, not initialized, use initialize() first!", file=sys.stderr)
             return None
@@ -279,6 +291,7 @@ class GptBox(chatterbox):
         return response
 
     def prompt(self, text):
+        """Add text to the transcript to help guide the agent."""
         if not self.__initialized:
             print("Error, not initialized, use initialize() first!", file=sys.stderr)
         if not validateContext(text):
@@ -290,6 +303,7 @@ class GptBox(chatterbox):
         return True
 
     def getTranscript(self):
+        """Get the current trascript."""
         if not self.__initialized:
             print("Error, transcript is made during initialization, use initialize() first!", file=sys.stderr)
             return None
@@ -297,6 +311,7 @@ class GptBox(chatterbox):
     
 
     def updateTranscript(self, newTranscript):
+        """Replace the transcript, if it is valid."""
         if not self.__initialized:
             print("Error, the transcript value is made during initialization, use initialize() first!", file=sys.stderr)
         return self.__setTranscript(self, newTranscript)
