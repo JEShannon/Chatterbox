@@ -66,9 +66,25 @@ def __saveKeys(keyMap):
 class GptBox(chatterbox):
     """
     This class wraps around the openai API to handle busywork like key and transcript management.
+    
     In order to function correctly, the object must be properly initialized after creation, through the initialize() method.
     This module also requires a key (either given or from a file) in order to be initialized.
     If initialized, the object should have all the information needed to call the API, provided it is accurate.
+
+    Public methods:
+    addContext - adds to the existing context for the agent
+    setContext - replaces the existing context for the agent
+    getContext - returns the initial context used for the agent
+    setKey - sets a key that instances of this agent can use
+    getKey - gets a key known to this class
+    getCurrentKeyName - get the identifier for the key currently chosen for use
+    useKey - choose a key to use for agents that is already known to this class
+    initialize - create an instance for a new agent ready to use the API
+    isInitialized - check if an object is initialized
+    respond - call the API and record the response
+    prompt - add (typically human) input for the agent to consider
+    getTranscript - get a copy of the transcript with the agent
+    updateTranscript - replace the transcript with the agent
     """
     def __checkForKey(self):
         """Check for an .apikeys file containing openai keys"""
