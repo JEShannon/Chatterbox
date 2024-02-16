@@ -117,17 +117,9 @@ class GptBox(chatterbox):
         #now initialize the settings so we can add context if present
         self.__context = []
         if(context and validateContext(context)):
-            if isinstance(context, str):
-                self.__context = [context]
-            else:
-                self.__context = context
+            super.__init__(context, KEYS_LOCATION, key, keyName, saveKeys)
         elif(context):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
-        self.__keys = {}
-        self.__activeKey = None
-        self.__keysUpdated = False
-        self.__saveKeys = saveKeys
-        self.__checkForKey()
         self.__apiClient = None
         self.__initialized = False
 
@@ -149,20 +141,7 @@ class GptBox(chatterbox):
 
     #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName, *, useKey=False):
-        """
-        Save a key to the manager under a specified name, if both exist
-
-        Keyword Arguements:
-        key - Object representation of the key, must exist
-        keyName - String name for the key, must exist and be a string
-        useKey [specified only] - if true, set this to be the key used by the agent
-        """
-        if (not key) or (not keyName) or (not isinstance(keyName, str)):
-            return
-        self.__keys[keyName] = key
-        self.__keysUpdated = True
-        if(useKey):
-            self.activeKey = keyName
+        
 
     def getKey(self, keyName=None, *, default=None):
         """Get the key specified.  Return default if it doesn't exist."""

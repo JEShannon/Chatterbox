@@ -38,6 +38,8 @@ class chatterbox ():
         self.__context = context
         self.__keyLoc = keyLoc
         self.__saveKeys = saveKeys
+        self.__keys = {}
+        self.__keysUpdated = False
         if key:
             if keyName:
                 self.setKey(key, keyName, useKey=True)
@@ -68,7 +70,20 @@ class chatterbox ():
         return self.__context
 
     def setKey(self, key, keyName, *, useKey):
-        pass
+        """
+        Save a key to the manager under a specified name, if both exist
+
+        Keyword Arguements:
+        key - Object representation of the key, must exist
+        keyName - String name for the key, must exist and be a string
+        useKey [specified only] - if true, set this to be the key used by the agent
+        """
+        if (not key) or (not keyName) or (not isinstance(keyName, str)):
+            return
+        self.__keys[keyName] = key
+        self.__keysUpdated = True
+        if(useKey):
+            self.activeKey = keyName
 
     def getKey(self, keyName):
         pass
@@ -80,7 +95,7 @@ class chatterbox ():
         pass
 
     def isInitialized(self):
-        pass
+        return False
 
     #Functions for interacting with the bot
     def respond(self):
