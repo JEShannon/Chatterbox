@@ -42,11 +42,10 @@ class chatterbox ():
         self.__keysUpdated = False
         if key:
             if keyName:
-                self.setKey(key, keyName, useKey=True)
+                self.setKey(key, keyName, True)
             else:
-                self.setKey(key, DEFAULT_KEY_NAME, useKey=True)
-        else:
-            self.checkForKeys()
+                self.setKey(key, DEFAULT_KEY_NAME, True)
+        self.checkForKeys()
     
     def addContext(self, newContext):
         if isinstance(newContext, str):
@@ -69,7 +68,7 @@ class chatterbox ():
     def getContext(self):
         return self.__context
 
-    def setKey(self, key, keyName, *, useKey):
+    def setKey(self, key, keyName, useKey=False):
         """
         Save a key to the manager under a specified name, if both exist
 
@@ -79,17 +78,29 @@ class chatterbox ():
         useKey [specified only] - if true, set this to be the key used by the agent
         """
         if (not key) or (not keyName) or (not isinstance(keyName, str)):
-            return
+            return False
         self.__keys[keyName] = key
         self.__keysUpdated = True
         if(useKey):
             self.activeKey = keyName
+        return True
 
-    def getKey(self, keyName):
-        pass
+    def getKey(self, keyName, default):
+        """Get the key specified.  Return default if it doesn't exist."""
+        #if no name is supplied, get the key we are currently using
+        if not keyName:
+            return self.__keys.get(self.__activeKey, default)
+        return self.__keys.get(keyName, default)
 
     def useKey(self, keyName):
-        pass
+        #TODO: validate the key somehow, but currently it just accepts it if it exists at all
+        #Returns true if the system successfully swapped to the key
+        #Returns false if the key wasn't found
+        #Note that a key MUST be set in order to fully initialize
+        if self.__keys.get(keyName):
+            self.__activeKey = keyName
+            return True
+        return False
 
     def initialize(self):
         pass
@@ -97,7 +108,7 @@ class chatterbox ():
     def isInitialized(self):
         return False
 
-    #Functions for interacting with the bot
+    #Functions for interacting with the agent
     def respond(self):
         pass
 

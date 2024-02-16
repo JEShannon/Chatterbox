@@ -86,7 +86,9 @@ class GptBox(chatterbox):
     getTranscript - get a copy of the transcript with the agent
     updateTranscript - replace the transcript with the agent
     """
-    
+
+    def checkForKeys(self):
+        super().checkForKeys()
         
     def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None, keyName=None, saveKeys=True):
         """
@@ -115,9 +117,8 @@ class GptBox(chatterbox):
                 return
         self.__aiModel = model_type
         #now initialize the settings so we can add context if present
-        self.__context = []
         if(context and validateContext(context)):
-            super.__init__(context, KEYS_LOCATION, key, keyName, saveKeys)
+            super().__init__(context, KEYS_LOCATION, key, keyName, saveKeys)
         elif(context):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
         self.__apiClient = None
@@ -126,44 +127,32 @@ class GptBox(chatterbox):
     def addContext(self, newContext):
         """Add the given context to the existing context the model has, if it is valid."""
         if validateContext(newContext):
-            return super.addContext(newContext)
+            return super().addContext(newContext)
 
     def setContext(self, newContext):
         """Replace the context with the given context, if it is valid."""
         #returns true if the context was accepted, false otherwise
         if validateContext(newContext):
-            return super.setContext(newContext)
+            return super().setContext(newContext)
         return False
 
     def getContext(self):
         """Return the context."""
-        return super.getContext()
+        return super().getContext()
 
     #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName, *, useKey=False):
-        
+        return super().setKey(self, key, keyName, useKey)
 
     def getKey(self, keyName=None, *, default=None):
-        """Get the key specified.  Return default if it doesn't exist."""
-        #if no name is supplied, get the key we are currently using
-        if not keyName:
-            return self.__keys.get(self.__activeKey, default)
-        return self.__keys.get(keyName, default)
+        return super().getKey(keyName, default)
 
     def getCurrentKeyName(self):
-        """Get the name of the key we are using."""
-        return self.__activeKey
+        return super().getCurrentKeyName()
 
     def useKey(self, keyName):
         """Change the key we are using to the specified one, if it exists."""
-        #TODO: validate the key somehow, but currently it just accepts it if it exists at all
-        #Returns true if the system successfully swapped to the key
-        #Returns false if the key wasn't found
-        #Note that a key MUST be set in order to fully initialize
-        if self.__keys.get(keyName):
-            self.__activeKey = keyName
-            return True
-        return False
+        return super().useKey(keyName)
 
     def initialize(self, *, key=None, context=None, noContext=False):
         """
