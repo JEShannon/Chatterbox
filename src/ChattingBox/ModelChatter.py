@@ -46,14 +46,26 @@ class chatterbox ():
         else:
             self.checkForKeys()
     
-    def addContext(self):
-        pass
+    def addContext(self, newContext):
+        if isinstance(newContext, str):
+            self.__context.append(newContext)
+            return True    
+        if isinstance(newContext, list):
+            self.__context.extend(newContext)
+            return True
+        return False
 
-    def setContext(self):
-        pass
+    def setContext(self, newContext):
+        if isinstance(newContext, str):
+            self.__context = [newContext]
+            return True
+        if isinstance(newContext, list):
+            self.__context = newContext
+            return True
+        return False
 
     def getContext(self):
-        pass
+        return self.__context
 
     def setKey(self, key, keyName, *, useKey):
         pass

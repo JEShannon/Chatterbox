@@ -134,25 +134,18 @@ class GptBox(chatterbox):
     def addContext(self, newContext):
         """Add the given context to the existing context the model has, if it is valid."""
         if validateContext(newContext):
-            if isinstance(newContext, str):
-                self.__context.append(newContext)
-            else:
-                self.__context.extend(newContext)
+            return super.addContext(newContext)
 
     def setContext(self, newContext):
         """Replace the context with the given context, if it is valid."""
         #returns true if the context was accepted, false otherwise
         if validateContext(newContext):
-            if isinstance(newContext, str):
-                self.__context = [newContext]
-            else:
-                self.__context = newContext
-            return True
+            return super.setContext(newContext)
         return False
 
     def getContext(self):
         """Return the context."""
-        return self.__context
+        return super.getContext()
 
     #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName, *, useKey=False):
