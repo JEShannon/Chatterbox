@@ -86,35 +86,7 @@ class GptBox(chatterbox):
     getTranscript - get a copy of the transcript with the agent
     updateTranscript - replace the transcript with the agent
     """
-    def __checkForKey(self):
-        """Check for an .apikeys file containing openai keys"""
-        keyNames = []
-        with open(KEYS_LOCATION) as keyFile:
-            for keyLine in keyFile:
-                if(not keyLine.strip()):
-                    continue
-                #check if the line even exists!
-                #TODO: See if you can validate the key somehow, right now it just trusts it.
-                #TODO: Use OS environ vars to load default keys
-                name = DEFAULT_KEY_NAME
-                keyTokens = keyLine.strip().split(":")
-                if(len(keyTokens) > 2):
-                    print("More than two tokens found on a line in the keys file, skipping...", file=sys.stderr)
-                    continue
-                if(len(keyTokens) == 2 and keyTokens[0].strip()):
-                    #this one has a name, use it!
-                    name = keyTokens[0].strip()
-                if(keyTokens[-1].strip()):
-                    keyNames.append(name)
-                    self.__keys[name] = keyTokens[-1]
-        if(not self.__keys):
-            print("Warning, no keys found.  Ensure keys are set before using!", file=sys.stderr)
-        else:
-            #set ourselves to the key default if it exists, otherwise whichever was first
-            if DEFAULT_KEY_NAME in keyNames:
-                self.__activeKey = DEFAULT_KEY_NAME
-            else:
-                self.__activeKey = keyNames[0]
+    
         
     def __init__(self, *, model_type = "gpt-3.5-turbo", context = "", key=None, keyName=None, saveKeys=True):
         """
