@@ -12,7 +12,7 @@ GPT--
 Other Generative AI systems:
 
 Gemini (formerly bard)?
--Currently no official python package, restricted access to API
+-Available python package, probably GPT needs refactoring to bring common functionality to the parent class
 -Might have to write the API caller myself to add to this package
 -Requires more investigation
 
