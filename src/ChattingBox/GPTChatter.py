@@ -165,28 +165,12 @@ class GptBox(chatterbox):
         context - Agent context to inform the agent's responses.  Must be valid
         noContext - If true, the agent ignores any checks for context and starts with no context at all.
         """
-        #first check if the key exists
-        if not self.__activeKey:
-            if key:
-                #if given a key here, then set it to be the default and use it
-                self.__activeKey = DEFAULT_KEY_NAME
-                self.__keys[DEFAULT_KEY_NAME] = key
-            elif self.__keys.get(DEFAULT_KEY_NAME):
-                #if a default key was added/found but somehow missed, use it here
-                self.__activeKey = DEFAULT_KEY_NAME
-            #the checks failed, print to stderr and return False.  Do not initialize.
-            else:
-                print("No keys were found!  Either give one to the initialize function or set it with setKey!", file=sys.stderr)
-                return False
-        #now check if the context exists or if the user provided context here
-        if not self.__context:
-            if noContext:
-                #just let it go through without any context
-                self.__context = []
-            elif not self.setContext(context):
-                #if this context is invalid, then we failed initialization.  State that and return.
-                print("Warning!  Context is invalid!  Aborting!", file=sys.stderr)
-                return False
+        #first check if the context exists or if the user provided context here
+        if context and not self.validateContext(context):
+            print("Warning!  Given context is invalid!  Aborting!", file=sys.stderr)
+            return False
+        key = super().initialize(key, context, noContext)
+        ##### TODO FINISH INITIALIZATION
         #Everything is now ready to begin, so wrap up and return
         #We set the base context used by the system, as well as the key used
         self.__transcript = self.__context

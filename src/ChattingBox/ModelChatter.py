@@ -85,7 +85,7 @@ class chatterbox ():
             self.activeKey = keyName
         return True
 
-    def getKey(self, keyName, default):
+    def getKey(self, keyName, default=None):
         """Get the key specified.  Return default if it doesn't exist."""
         #if no name is supplied, get the key we are currently using
         if not keyName:
@@ -102,10 +102,35 @@ class chatterbox ():
             return True
         return False
 
-    def initialize(self):
-        pass
+    def getCurrentKeyName(self):
+        """Get the name of the key we are using."""
+        return self.__activeKey
+
+    def initialize(self, key=None, context=None, noContext=False):
+        """Check if the object is able to be initialized.
+
+        Return the key if True, otherwise return None."""
+        #check if context was passed to the function, and after adding it check that the context exists
+        if(context and not noContext):
+            self.setContext(context)
+        if (not self.context) and (not noContext):
+            print("Warning!  No context for agent!  Aborting!", file=sys.stderr)
+            return None
+        #check that there is an active key selected.
+        if key:
+            #everything is correct, return the key
+            #if the key was given here, we aren't saving it
+            return key
+        else:
+            if not self.getKey():
+                print("No keys were found!  Either give one to the initialize function or set it with setKey!", file=sys.stderr)
+            return self.getKey()
+            
 
     def isInitialized(self):
+        """Subclasses must determine if initialization is done.
+
+        This always returns false"""
         return False
 
     #Functions for interacting with the agent
