@@ -180,10 +180,7 @@ class GptBox(chatterbox):
                 
     def __setTranscript(self, script):
         if validateContext(script):
-            if isinstance(script, str):
-                self.__transcript = [script]
-            else:
-                self.__transcript = script
+            super().updateTranscript(script)
             return True
         return False
 
@@ -195,7 +192,7 @@ class GptBox(chatterbox):
         #take the transcript, and turn it into a form usable by the API
         #the API expects a list of dicts, each having a "role" and "content" key
         apiDictList = []
-        for line in self.__transcript:
+        for line in super().getTranscript():
             parts = line.split(":")
             apiDict = {"role":parts[0].strip(), "content":parts[1].strip()}
             if DEBUG_OUTPUT:
@@ -229,10 +226,7 @@ class GptBox(chatterbox):
             print("Error, not initialized, use initialize() first!", file=sys.stderr)
         if not validateContext(text):
             return False
-        if isinstance(text, str):
-            self.__transcript.append(text)
-        else: #for validateContext to pass, it must be either a list of strings or a string
-            self.__transcript.extend(text)
+        super().prompt(text)
         return True
 
     def getTranscript(self):
@@ -240,7 +234,7 @@ class GptBox(chatterbox):
         if not self.__initialized:
             print("Error, transcript is made during initialization, use initialize() first!", file=sys.stderr)
             return None
-        return self.__transcript
+        return super().getTranscript()
     
 
     def updateTranscript(self, newTranscript):

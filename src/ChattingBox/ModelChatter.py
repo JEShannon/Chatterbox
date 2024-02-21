@@ -116,6 +116,7 @@ class chatterbox ():
         if (not self.context) and (not noContext):
             print("Warning!  No context for agent!  Aborting!", file=sys.stderr)
             return None
+        self.__transcript = self.__context
         #check that there is an active key selected.
         if key:
             #everything is correct, return the key
@@ -135,14 +136,20 @@ class chatterbox ():
 
     #Functions for interacting with the agent
     def respond(self):
-        pass
+        pass #This is always subclass specific
 
     def prompt(self, text):
-        pass
+        if isinstance(script, str):
+            self.__transcript.append(script)
+        else:
+            self.__transcript.extend(script)
 
     def getTranscript(self):
-        pass
+        return self.__transcript
 
     def updateTranscript(self):
-        pass
+        if isinstance(script, str):
+            self.__transcript = [script]
+        else:
+            self.__transcript = script
     
