@@ -113,7 +113,7 @@ class chatterbox ():
         #check if context was passed to the function, and after adding it check that the context exists
         if(context and not noContext):
             self.setContext(context)
-        if (not self.context) and (not noContext):
+        if (not self.__context) and (not noContext):
             print("Warning!  No context for agent!  Aborting!", file=sys.stderr)
             return None
         self.__transcript = self.__context
@@ -139,15 +139,15 @@ class chatterbox ():
         pass #This is always subclass specific
 
     def prompt(self, text):
-        if isinstance(script, str):
-            self.__transcript.append(script)
+        if isinstance(text, str):
+            self.__transcript.append(text)
         else:
-            self.__transcript.extend(script)
+            self.__transcript.extend(text)
 
     def getTranscript(self):
         return self.__transcript
 
-    def updateTranscript(self):
+    def updateTranscript(self, script):
         if isinstance(script, str):
             self.__transcript = [script]
         else:

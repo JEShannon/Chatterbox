@@ -1,11 +1,14 @@
 import openai
 import os
 import sys
-from ModelChatter import chatterbox
+from .ModelChatter import chatterbox
+#NOTE: To run just this like a script, you must use the -m flag in your python command
+#If not, there will be a relative import error!  This is needed for the module to work correctly
 
 __validmodels = ["gpt-3.5-turbo", "gpt-4", "gpt-4-32k", ]
 __validoperators = ["system", "user", "assistant", ] #all valid operators
 AIOPERATOR = __validoperators[2] #the operator for the AI specifically
+USEROPERATOR = __validoperators[1]
 #possible TODO: allow this to be changed somehow?  Likely unneeded
 
 DEBUG_OUTPUT = False
@@ -172,17 +175,9 @@ class GptBox(chatterbox):
         key = super().initialize(key, context, noContext)
         ##### TODO FINISH INITIALIZATION
         #Everything is now ready to begin, so wrap up and return
-        #We set the base context used by the system, as well as the key used
-        self.__transcript = self.__context
-        self.__apiClient = openai.OpenAI(api_key = self.getKey())
+        self.__apiClient = openai.OpenAI(api_key = key)
         self.__initialized = True
         return True
-                
-    def __setTranscript(self, script):
-        if validateContext(script):
-            super().updateTranscript(script)
-            return True
-        return False
 
     def isInitialized(self):
         """Check if the object has finished initialization."""
@@ -241,5 +236,9 @@ class GptBox(chatterbox):
         """Replace the transcript, if it is valid."""
         if not self.__initialized:
             print("Error, the transcript value is made during initialization, use initialize() first!", file=sys.stderr)
-        return self.__setTranscript(self, newTranscript)
+            return False
+        if validateContext(newTranscript):
+            super().updateTranscript(newTranscript)
+            return True
+        return False
 
