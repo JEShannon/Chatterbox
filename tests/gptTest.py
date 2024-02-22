@@ -53,6 +53,7 @@ def __compareContexts(con1, con2):
 
 def contextTest(gptAgent):
     #First get the current context
+    currContext = gptAgent.getContext()
     #Then add a line to the context as the user
     #Ensure the context was added correctly
     #Add context using the AI's operator
@@ -60,4 +61,3 @@ def contextTest(gptAgent):
     #Replace the context, with all three tags of context used
     #Fetch the context, ensure it is correct again
     #Initialize the agent and ensure no problems
-    pass

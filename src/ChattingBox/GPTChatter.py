@@ -35,6 +35,32 @@ def __validateLine(line):
         return False
     return True
 
+def makeContextValid(context, operator):
+    op = None
+    #If the operator is a number and < len of validoperators, use it
+    if isinstance(operator, int) and operator < 3 and operator >= 0:
+        op = __validoperators[operator]
+    #If the operator is a word used in validoperators use it
+    if operator in __validoperators:
+        op = operator
+    #otherwise print an error and return the original object
+    if not op:
+        print("Error, the operator",operator,"is not valid!  Use GPTChatter.getValidOperators() for a full list!", file=sys.stderr)
+        return context
+    #now simply add the tag for the user operator for each line and return
+    if isinstance(context, str):
+        return op + ":" + context
+    elif isinstance(context, list):
+        con = []
+        for line in context:
+            if not isinstance(context, list):
+                print("Error, the context must be a string or list of strings, instead found type", type(line), "in the list.", file=sys.stderr)
+                return context
+            con.append(op + ":" + line)
+        return con
+    print("Error, the context must be a string or list of strings, instead found type", type(line), file=sys.stderr)
+    return context
+
 def validateContext(context, singleLine = False):
     """
     Validate that the context is correct and won't cause errors during API calls.
