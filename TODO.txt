@@ -27,4 +27,3 @@ Claude:
 OTHER:
 --Add github integration for Pypi
 --Improve documentation of functions for better software maintenance
---Refactor code from GPTChatter to ModelChatter that will be used by other (to be made) classes

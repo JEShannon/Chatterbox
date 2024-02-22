@@ -38,3 +38,26 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def __compareContexts(con1, con2):
+    if not (isinstance(con1, list) and isinstance(con2, list)):
+        return False
+    if not len(con1) == len(con2):
+        return False
+    for i in range(len(con1)):
+        if not con1[i] == con2[i]:
+            return False
+    return True
+
+
+def contextTest(gptAgent):
+    #First get the current context
+    #Then add a line to the context as the user
+    #Ensure the context was added correctly
+    #Add context using the AI's operator
+    #Ensure the context is correct again
+    #Replace the context, with all three tags of context used
+    #Fetch the context, ensure it is correct again
+    #Initialize the agent and ensure no problems
+    pass
