@@ -14,8 +14,6 @@ myPrompt = ["system : Please respond by only writing one line containing only th
 #
 #####
 
-#A correct response is first any response, and then secondly the text should read "Alpha Bravo Charlie"
-
 def main():
 
     box = GptBox(context=myPrompt)
