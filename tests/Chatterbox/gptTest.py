@@ -103,12 +103,40 @@ def keyTest(gptAgent):
     if not gptAgent.useKey("keyTest2"):
         print("Failed to set keyTest2 to active key in keyTest")
         return False
-    if not gptAgent.getKey() == "bcde":
-        print("Failed to recall keyTest2 as active key in keyTest")
-        return False
     #Ensure we get that same key from both asking by name and by active key
+    if not (gptAgent.getKey() == "bcde" and gptAgent.getKey("keyTest2") == "bcde"):
+        print("Failed ensuring keyTest2 was correct from both methods of asking in keyTest")
+        return False
     #Put a new key in the same non-default name
+    if not gptAgent.setKey("xyz", "keyTest2"):
+        print("Failed to overwrite keyTest2 in keyTest")
+        return False
     #Ensure it is now found when asking by name or for the active key
+    if not (gptAgent.getKey() == "xyz" and gptAgent.getKey("keyTest2") == "xyz"):
+        print("Failed ensuring keyTest2 was correct the second time from both methods of asking in keyTest")
+        return False
+    #Create a final new key, and set it to be active on creation
+    if not gptAgent.setKey("def", "keyTest3", useKey=True):
+        print("Failed to create keyTest3 in keyTest")
+        return False
+    #Ensure it is now found when asking by name or for the active key
+    if not (gptAgent.getKey() == "def" and gptAgent.getKey("keyTest3") == "def"):
+        print("Failed ensuring keyTest3 was correct from both methods of asking in keyTest")
+        return False
+    #Replace the previous key using set key, setting it to be the default key
+    if not gptAgent.setKey("foobar", "keyTest2", useKey=True):
+        print("Failed to overwrite keyTest2 and set it as the default key in keyTest")
+        return False
+    #Ensure it is now found when asking by name or for the active key
+    if not (gptAgent.getKey() == "foobar" and gptAgent.getKey("keyTest2") == "foobar"):
+        print("Failed ensuring keyTest2 was correct the third time from both methods of asking in keyTest")
+        return False
     #Set the default key to the original key
+    if not gptAgent.setKey(realKey, "real", useKey=True):
+        print("Failed to reintroduce the real key and set it as the default key in keyTest")
+        return False
     #Ensure it initializes properly
-    pass
+    if not gptAgent.initialize(noContext=True):
+        print("Failed to initialize in keyTest")
+        return False
+    return True
