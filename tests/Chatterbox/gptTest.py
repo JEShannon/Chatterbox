@@ -72,12 +72,40 @@ def contextTest(gptAgent):
 
 def keyTest(gptAgent):
     #Check if there is currently a key there (we assume there is)
+    if not gptAgent.getKey():
+        print("System failed to return an initial key, ensure it has one when keyTest is called!")
+        return False
     #Check if we can add a new key in
+    if not gptAgent.setKey("abcd", "keyTest1"):
+        print("Failed to set keyTest1 in keyTest")
+        return False
+    if not gptAgent.getKey("keyTest1") == "abcd":
+        print("Failed to recall keyTest1 in keyTest")
+        return False
     #Save the old (real) key
+    realKey = gptAgent.getKey()
     #Set a new default key
+    if not gptAgent.setKey("qwerty", "default"):
+        print("Failed to set a new default key in keyTest")
+        return False
     #Check that the default key was updated
+    if not gptAgent.getKey("default") == "qwerty":
+        print("Failed to recall keyTest1 in keyTest")
+        return False
     #Create a new key to use under a non-default name
+    if not gptAgent.setKey("bcde", "keyTest2"):
+        print("Failed to set keyTest2 in keyTest")
+        return False
+    if not gptAgent.getKey("keyTest2") == "bcde":
+        print("Failed to recall keyTest2 in keyTest")
+        return False
     #Set that to be the used key
+    if not gptAgent.useKey("keyTest2"):
+        print("Failed to set keyTest2 to active key in keyTest")
+        return False
+    if not gptAgent.getKey() == "bcde":
+        print("Failed to recall keyTest2 as active key in keyTest")
+        return False
     #Ensure we get that same key from both asking by name and by active key
     #Put a new key in the same non-default name
     #Ensure it is now found when asking by name or for the active key
