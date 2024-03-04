@@ -71,6 +71,19 @@ def contextTest(gptAgent):
     return True
 
 def keyTest(gptAgent):
+    """
+    Check that the provided agent's key management system is working properly.
+
+    This tests the following functions:
+    getKey()
+    setKey()
+    useKey()
+    initialize()*
+    *This function only ensures that initialization works in relation to the key management system.
+
+    This test only requires a valid key if there is some sort of validation, which isn't the case at the time of writing.
+    
+    """
     #Check if there is currently a key there (we assume there is)
     if not gptAgent.getKey():
         print("System failed to return an initial key, ensure it has one when keyTest is called!")
@@ -140,3 +153,5 @@ def keyTest(gptAgent):
         print("Failed to initialize in keyTest")
         return False
     return True
+
+
