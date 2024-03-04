@@ -154,4 +154,26 @@ def keyTest(gptAgent):
         return False
     return True
 
-
+def transcriptTest(gptAgent):
+    #First set the context to a single line to ensure a consistent start
+    transcript = []
+    startingContext = gptAgent.makeContextValid("This is a debugging test you are helping with.  Answer shortly and accurately.", 0)
+    gptAgent.setContext(startingContext)
+    transcript.append(startingContext)
+    #Now initialize, assume there was a valid key
+    if not gptAgent.initialize():
+        print("Failed to initialize in transcriptTest")
+        return False
+    #Ensure the transcript is correct
+    if not __compareContexts(gptAgent.getTranscript(), transcript):
+        print("Failed initial check in transcriptTest")
+        return False
+    #Add to the transcript, using each type of operator using individual calls
+    #Validate it
+    #Add to the transcript, using each type of operator in a list with a single call
+    #Validate it
+    #Replace the transcript
+    #Validate it
+    #Get a response from the agent
+    #Ensure that the response was saved properly
+    return True
