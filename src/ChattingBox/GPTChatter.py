@@ -120,14 +120,13 @@ class GptBox(chatterbox):
                 return
         self.__aiModel = model_type
         #now initialize the settings so we can add context if present
-        if(context and validateContext(context)):
-            super().__init__(context, KEYS_LOCATION, key, keyName, saveKeys)
-        elif(context):
+        if(context and not validateContext(context)) or ((not context) and (not context == "")):
             raise Exception("Context must be a list of strings.  See formatting guidelines for acceptable examples.")
+        super().__init__(context, KEYS_LOCATION, key, keyName, saveKeys)
         self.__apiClient = None
         self.__initialized = False
 
-    def makeContextValid(context, operator = None):
+    def makeContextValid(self, context, operator = None):
         op = None
         #If the operator is a number and < len of validoperators, use it
         if isinstance(operator, int) and operator < 3 and operator >= 0:
@@ -171,7 +170,7 @@ class GptBox(chatterbox):
 
     #TODO: use the environment variables to hold default keys
     def setKey(self, key, keyName, *, useKey=False):
-        return super().setKey(self, key, keyName, useKey)
+        return super().setKey(key, keyName, useKey)
 
     def getKey(self, keyName=None, *, default=None):
         return super().getKey(keyName, default)
@@ -223,7 +222,7 @@ class GptBox(chatterbox):
 
     def __APIToTranscript(self, response):
         #given the following response, add it to the transcript
-        newResponse = AIOPERATOR + ":" + response
+        newResponse = self.makeContextValid(str(response), AIOPERATOR)
         return self.prompt(newResponse)
 
     def respond(self):

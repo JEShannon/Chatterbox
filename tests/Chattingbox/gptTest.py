@@ -134,6 +134,7 @@ def keyTest(gptAgent):
         return False
     #Ensure it is now found when asking by name or for the active key
     if not (gptAgent.getKey() == "def" and gptAgent.getKey("keyTest3") == "def"):
+        print(gptAgent.getKey(), gptAgent.getKey("keyTest3"))
         print("Failed ensuring keyTest3 was correct from both methods of asking in keyTest")
         return False
     #Replace the previous key using set key, setting it to be the default key
@@ -155,6 +156,21 @@ def keyTest(gptAgent):
     return True
 
 def transcriptTest(gptAgent):
+    """
+    Check the agent's transcript management system to ensure it works properly.
+
+    This test set tests the following functions:
+    GptBox.setContext()*
+    GptBox.initialize()*
+    GptBox.makeContextValid()
+    GptBox.prompt()
+    GptBox.getTranscript()
+    GptBox.setTranscript()
+    GptBox.respond()
+
+    *setContext and initialization is only tested to ensure a use case beginning at an empty starting context to eventual initialization
+      functions correctly, as this was a discovered bug during development.
+    """
     #First set the context to a single line to ensure a consistent start
     transcript = []
     startingContext = gptAgent.makeContextValid("This is a debugging test you are helping with.  Answer shortly and accurately.", 0)
@@ -162,18 +178,48 @@ def transcriptTest(gptAgent):
     transcript.append(startingContext)
     #Now initialize, assume there was a valid key
     if not gptAgent.initialize():
-        print("Failed to initialize in transcriptTest")
+        print("Failed to initialize in transcriptTest.")
         return False
     #Ensure the transcript is correct
     if not __compareContexts(gptAgent.getTranscript(), transcript):
-        print("Failed initial check in transcriptTest")
+        print("Failed initial check in transcriptTest.")
         return False
     #Add to the transcript, using each type of operator using individual calls
+    scripts = [gptAgent.makeContextValid("System message!", 0),
+               gptAgent.makeContextValid("User message!", 1),
+               gptAgent.makeContextValid("Agent message!", 2)]
+    for script in scripts:
+        gptAgent.prompt(script)
+        transcript.append(script)
     #Validate it
+    if not __compareContexts(gptAgent.getTranscript(), transcript):
+        print("Failed multiple update calls test in transcriptTest.")
+        return False
     #Add to the transcript, using each type of operator in a list with a single call
+    scripts = [gptAgent.makeContextValid("Second system message!", 0),
+               gptAgent.makeContextValid("Second user message!", 1),
+               gptAgent.makeContextValid("Second agent message!", 2)]
+    gptAgent.prompt(scripts)
+    transcript.extend(scripts)
     #Validate it
+    if not __compareContexts(gptAgent.getTranscript(), transcript):
+        print("Failed single update call test in transcriptTest.")
+        return False
     #Replace the transcript
+    finalScript = [startingContext,
+                   gptAgent.makeContextValid("What is your name?", 2)]
+    gptAgent.updateTranscript(finalScript)
+    transcript = []
+    transcript.extend(finalScript)
     #Validate it
+    if not __compareContexts(gptAgent.getTranscript(), transcript):
+        print("Failed transcript replacement call test in transcriptTest.")
+        return False
     #Get a response from the agent
+    agentResponse = gptAgent.makeContextValid(gptAgent.respond().content, 2)
+    transcript.append(agentResponse)
     #Ensure that the response was saved properly
+    if not __compareContexts(gptAgent.getTranscript(), transcript):
+        print("Failed response recording test in transcriptTest.")
+        return False
     return True

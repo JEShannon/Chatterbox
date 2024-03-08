@@ -35,7 +35,7 @@ class chatterbox ():
                 self.__activeKey = keyNames[0]
     
     def __init__(self, context="", keyLoc="", key=None, keyName=None, saveKeys=True):
-        self.__context = context
+        self.__context = [context] if isinstance(context, str) else context
         self.__keyLoc = keyLoc
         self.__saveKeys = saveKeys
         self.__keys = {}
@@ -82,7 +82,7 @@ class chatterbox ():
         self.__keys[keyName] = key
         self.__keysUpdated = True
         if(useKey):
-            self.activeKey = keyName
+            self.__activeKey = keyName
         return True
 
     def getKey(self, keyName, default=None):
